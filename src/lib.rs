@@ -1,6 +1,3 @@
-// TODO: better errors
-// TODO: convert to lib by moving main.rs to src/lib.rs and making main a shell
-// TODO: better dependency definition
 //! This crate provides an API on top of [TinyTinyRSS](https://tt-rss.org/)
 //! ## Usage
 //! 
