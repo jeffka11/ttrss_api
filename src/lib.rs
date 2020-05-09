@@ -60,6 +60,10 @@ static TIMEOUT: u64 = 20;
 static mut SESSION_ID: Option<String> = None;
 
 
+/// Result object returned from all API calls.
+type ResponseResult = std::result::Result<Response, TTRSSAPIError>;
+
+
 /// Used in getCounters
 pub enum CounterType {
     Feeds,
@@ -509,34 +513,6 @@ pub struct Response {
     pub content: Content,
 }
 
-#[derive(Serialize, Deserialize, Debug, Display)]
-pub enum TTRSSAPIError {
-    InvalidRequest(String),
-    SerdeError(String),
-    EnvVarError(String),
-    ReqwestError(String),
-}
-
-impl std::convert::From<serde_json::error::Error> for TTRSSAPIError {
-    fn from(f: serde_json::error::Error) -> TTRSSAPIError {
-        println!("{}", f.to_string());
-        TTRSSAPIError::SerdeError(f.line().to_string())
-    }
-}
-
-impl std::convert::From<std::env::VarError> for TTRSSAPIError {
-    fn from(f: std::env::VarError) -> TTRSSAPIError {
-        TTRSSAPIError::EnvVarError(f.to_string())
-    }
-}
-
-impl std::convert::From<reqwest::Error> for TTRSSAPIError {
-    fn from(f: reqwest::Error) -> TTRSSAPIError {
-        TTRSSAPIError::ReqwestError("reqwset error".to_string())
-    }
-}
-
-
 impl fmt::Display for Response {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(f, "sequence: {}, ttrss status: {}, content: {}", self.seq.unwrap(), self.status, self.content)
@@ -544,8 +520,42 @@ impl fmt::Display for Response {
 }
 
 
-/// Result object returned from all API calls.
-type ResponseResult = std::result::Result<Response, TTRSSAPIError>;
+#[derive(Debug)]
+pub enum TTRSSAPIError {
+    SerdeError(serde_json::error::Error),
+    ReqwestError(reqwest::Error),
+    EnvVarError(std::env::VarError),
+    InvalidRequest(String),
+}
+
+impl fmt::Display for TTRSSAPIError {
+    fn fmt(&self, formatter: &mut fmt::Formatter) -> Result<(), fmt::Error> {
+        match self {
+            &TTRSSAPIError::SerdeError(ref e) => e.fmt(formatter),
+            &TTRSSAPIError::ReqwestError(ref e) => e.fmt(formatter),
+            &TTRSSAPIError::EnvVarError(ref e) => e.fmt(formatter),
+            &TTRSSAPIError::InvalidRequest(ref e) => formatter.write_str(&format!("Invalid request with message: {}", e))
+        }
+    }
+}
+
+impl From<serde_json::error::Error> for TTRSSAPIError {
+    fn from(err: serde_json::error::Error) -> TTRSSAPIError {
+        TTRSSAPIError::SerdeError(err)
+    }
+}
+
+impl From<std::env::VarError> for TTRSSAPIError {
+    fn from(err: std::env::VarError) -> TTRSSAPIError {
+        TTRSSAPIError::EnvVarError(err)
+    }
+}
+
+impl From<reqwest::Error> for TTRSSAPIError {
+    fn from(err: reqwest::Error) -> TTRSSAPIError {
+        TTRSSAPIError::ReqwestError(err)
+    }
+}
 
 
 /// Logout of the session.
