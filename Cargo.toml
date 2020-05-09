@@ -8,6 +8,7 @@ keywords = ["api", "TTRSS", "TinyTinyRSS"]
 categories = ["api-bindings"]
 repository = "https://github.com/jeffka11/ttrss_api"
 homepage = "https://github.com/jeffka11/ttrss_api"
+readme = "Readme.md"
 exclude = [
     "run_example.sh",
 ]
