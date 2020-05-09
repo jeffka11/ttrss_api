@@ -7,6 +7,7 @@ license = "MIT OR Apache-2.0"
 keywords = ["api", "TTRSS", "TinyTinyRSS"]
 categories = ["api-bindings"]
 repository = "https://github.com/jeffka11/ttrss_api"
+homepage = "https://github.com/jeffka11/ttrss_api"
 
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
