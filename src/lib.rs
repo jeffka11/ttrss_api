@@ -17,7 +17,6 @@
 //! To use:
 //! 
 //! ```ignore
-//! 
 //! fn main() {
 //!     let apilevel: Option<ApiLevel> = match get_api_level().expect("Failed to get response").content {
 //!         Content::GetApiLevel(x) => { Some(x) },
