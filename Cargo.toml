@@ -27,3 +27,7 @@ strum_macros = "^0.18.0"
 [[example]]
 name = "simple"
 path = "examples/simple.rs"
+
+
+[badges]
+maintenance = { status = "actively-developed" }
