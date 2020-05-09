@@ -23,7 +23,7 @@
 //!         Content::GetApiLevel(x) => { Some(x) },
 //!         _ => None,
 //!     };
-//!     println!("api level {:?}", apilevel.unwrap())
+//!     println!("api level {:?}", apilevel.unwrap());
 //! ```
 //! 
 extern crate chrono;
