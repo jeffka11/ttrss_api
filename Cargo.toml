@@ -13,13 +13,13 @@ homepage = "https://github.com/jeffka11/ttrss_api"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-chrono = { version = "0.4.11", features = ["serde"] }
-reqwest = { version = "0.10.4", features = ["blocking", "json"] }
-serde = { version = "1.0.107", features = ["derive"] }
-serde_json = "1.0.52"
-serde_with = { version = "1.4.0" }
-strum = "0.18.0"
-strum_macros = "0.18.0"
+chrono = { version = "^0.4.11", features = ["serde"] }
+reqwest = { version = "^0.10.4", features = ["blocking", "json"] }
+serde = { version = "^1.0.107", features = ["derive"] }
+serde_json = "^1.0.52"
+serde_with = { version = "^1.4.0" }
+strum = "^0.18.0"
+strum_macros = "^0.18.0"
 
 
 
