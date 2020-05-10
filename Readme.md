@@ -25,10 +25,12 @@ extern crate ttrss_api;
 To use:
 
 ```rust
+extern crate ttrss_api;
+use ttrss_api::* as ttrss;
 
 fn main() {
-    let apilevel: Option<ApiLevel> = match get_api_level().expect("Failed to get response").content {
-        Content::GetApiLevel(x) => { Some(x) },
+    let apilevel: Option<ttrss::ApiLevel> = match ttrss::get_api_level().expect("Failed to get response").content {
+        ttrss::Content::GetApiLevel(x) => { Some(x) },
         _ => None,
     };
     println!("api level {:?}", apilevel.unwrap());
