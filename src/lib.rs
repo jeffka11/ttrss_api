@@ -1,21 +1,21 @@
 //! This crate provides an API on top of [TinyTinyRSS](https://tt-rss.org/)
 //! ## Usage
-//! 
+//!
 //! Add this to your `Cargo.toml`:
-//! 
+//!
 //! ```toml
 //! [dependencies]
 //! ttrss_api = "0.0.1"
 //! ```
-//! 
+//!
 //! Then add this to your crate:
-//! 
+//!
 //! ```rust
 //! extern crate ttrss_api;
 //! ```
-//! 
+//!
 //! To use:
-//! 
+//!
 //! ```ignore
 //! fn main() {
 //!     let apilevel: Option<ApiLevel> = match get_api_level().expect("Failed to get response").content {
@@ -24,7 +24,7 @@
 //!     };
 //!     println!("api level {:?}", apilevel.unwrap());
 //! ```
-//! 
+//!
 extern crate chrono;
 extern crate strum;
 extern crate serde;
@@ -42,7 +42,7 @@ use serde_json::Value;
 use strum_macros::Display;
 
 
-/// Environment variable name for the API to TinyTinyRSS (TTRSS). 
+/// Environment variable name for the API to TinyTinyRSS (TTRSS).
 static ENVVAR_TTRSS_URL: &str = "TTRSS_API_URL";
 /// Environment variable name for the user id to login to the TTRSS instance
 static ENVVAR_TTRSS_USERID: &str = "TTRSS_USERID";
@@ -139,10 +139,10 @@ impl std::fmt::Display for UpdateArticleField {
 }
 
 /// Counter
-/// 
+///
 /// # Rust
 /// * get_counters
-/// 
+///
 /// # TTRSS
 /// * getCounters
 #[derive(Serialize, Deserialize, Debug, Clone, Eq, PartialEq)]
@@ -159,10 +159,10 @@ pub struct Counter {
 
 
 /// Feed
-/// 
+///
 /// # Rust
 /// * get_feeds
-/// 
+///
 /// # TTRSS
 /// * getFeeds
 #[derive(Serialize, Deserialize, Debug, Clone, Eq, PartialEq)]
@@ -180,11 +180,11 @@ pub struct Feed {
 }
 
 /// Attachment
-/// 
+///
 /// # Rust
 /// * get_headlines (indirectly)
 /// * get_article (indirectly)
-/// 
+///
 /// # TTRSS
 /// * getHeadlines (indirectly)
 /// * getArticle (indirectly)
@@ -204,19 +204,40 @@ pub struct Attachment {
     pub extra: HashMap<String, Value>,
 }
 
+
+/// Guid structure with version and uid details, along with hash
+///
+/// The hash is in SHA:* format, although this parser doesn't validate
+#[derive(Serialize, Deserialize, Debug, Clone, Eq, PartialEq)]
+pub struct GuidVerbose {
+    pub ver: Value,
+    pub uid: Value,
+    pub hash: String,
+}
+
+/// Guid
+///
+/// Unique udentifier. The String variant is observed to be a hash in SHA:* format, although this parser doesn't validate
+#[derive(Serialize, Deserialize, Debug, Clone, Eq, PartialEq)]
+pub enum Guid {
+    GuidVerbose,
+    String,
+}
+
 /// Single Headline
-/// 
+///
 /// # Rust
 /// * get_headlines (indirectly)
 /// * get_article (indirectly)
-/// 
+///
 /// # TTRSS
 /// * getHeadlines (indirectly)
 /// * get_article (indirectly)
 #[derive(Serialize, Deserialize, Debug, Clone, Eq, PartialEq)]
 pub struct Headline {
     pub id: Value,
-    pub guid: String,
+
+    pub guid: Value,
     pub unread: bool,
     pub marked: bool,
     pub published: bool,
@@ -227,6 +248,7 @@ pub struct Headline {
     pub comments: Option<String>,
     pub title: String,
     pub link: String,
+    pub feed_id: Option<i64>,
     pub tags: Option<Vec<String>>,
     pub attachments: Option<Vec<Attachment>>,
     pub excerpt: Option<String>,
@@ -236,13 +258,13 @@ pub struct Headline {
     pub comments_count: Option<i64>,
     pub comments_link: Option<String>,
     pub always_display_attachments: Option<bool>,
-    pub author: String,
-    pub score: i64,
+    pub author: Option<String>,
+    pub score: Option<i64>,
     pub note: Option<String>,
-    pub lang: String,
-    pub feed_id: Option<i64>,
+    pub lang: Option<String>,
     pub flavor_image: Option<String>,
     pub flavor_stream: Option<String>,
+    pub comments_kind: Option<i8>,
 
     /// Additional fields not specifically deefined in the struct
     #[serde(flatten)]
@@ -251,10 +273,10 @@ pub struct Headline {
 }
 
 /// Wraps some metadata around the headlines from get_headlines
-/// 
+///
 /// # Rust
 /// * get_headlines (indirectly)
-/// 
+///
 /// # TTRSS
 /// * getHeadlines (indirectly)
 #[derive(Serialize, Deserialize, Debug, Clone, Eq, PartialEq)]
@@ -267,10 +289,10 @@ pub struct HeadlineWrapper {
 }
 
 /// Categories
-/// 
+///
 /// # Rust
 /// * get_categories
-/// 
+///
 /// # TTRSS
 /// * getCategories
 #[derive(Serialize, Deserialize, Debug, Clone, Eq, PartialEq)]
@@ -283,10 +305,10 @@ pub struct Category {
 
 
 /// Labels
-/// 
+///
 /// # Rust
 /// * get_labels
-/// 
+///
 /// # TTRSS
 /// * getLabels
 #[derive(Serialize, Deserialize, Debug, Clone, Eq, PartialEq)]
@@ -299,10 +321,10 @@ pub struct Label {
 }
 
 /// Feed Tree
-/// 
+///
 /// # Rust
 /// * get_feed_tree
-/// 
+///
 /// # TTRSS
 /// * getFeedTree
 #[derive(Serialize, Deserialize, Debug, Clone, Eq, PartialEq)]
@@ -311,10 +333,10 @@ pub struct FeedTree {
 }
 
 /// Feed Tree Category wraps metadata around lower level feed tree items
-/// 
+///
 /// # Rust
 /// * get_feed_tree (indirectly)
-/// 
+///
 /// # TTRSS
 /// * getFeedTre (indirectly)
 #[derive(Serialize, Deserialize, Debug, Clone, Eq, PartialEq)]
@@ -325,10 +347,10 @@ pub struct FeedTreeCategory {
 }
 
 /// Feed Tree Item wraps represents the lowest level of item detail, although may contain child items
-/// 
+///
 /// # Rust
 /// * get_feed_tree (indirectly)
-/// 
+///
 /// # TTRSS
 /// * getFeedTree (indirectly)
 #[derive(Serialize, Deserialize, Debug, Clone, Eq, PartialEq)]
@@ -356,10 +378,10 @@ pub struct FeedTreeItem {
 }
 
 /// Login
-/// 
+///
 /// # Rust
 /// * login
-/// 
+///
 /// # TTRSS
 /// * login
 #[derive(Serialize, Deserialize, Debug, Clone, Eq, PartialEq)]
@@ -370,10 +392,10 @@ pub struct Login {
 
 
 /// API Level
-/// 
+///
 /// # Rust
 /// * get_api_level
-/// 
+///
 /// # TTRSS
 /// * getApiLevel
 #[derive(Serialize, Deserialize, Debug, Clone, Eq, PartialEq)]
@@ -383,10 +405,10 @@ pub struct ApiLevel {
 
 
 /// Version
-/// 
+///
 /// # Rust
 /// * get_version
-/// 
+///
 /// # TTRSS
 /// * getVersion
 #[derive(Serialize, Deserialize, Debug, Clone, Eq, PartialEq)]
@@ -395,10 +417,10 @@ pub struct Version {
 }
 
 /// Error response returned from API
-/// 
+///
 /// # Rust
 /// * any that return an error from the API call
-/// 
+///
 /// # TTRSS
 /// * any that return an error from the API call
 #[derive(Serialize, Deserialize, Debug, Clone, Eq, PartialEq)]
@@ -410,10 +432,10 @@ pub struct ApiError {
 
 
 /// Logged In
-/// 
+///
 /// # Rust
 /// * is_logged_in
-/// 
+///
 /// # TTRSS
 /// * isLoggedIn
 #[derive(Serialize, Deserialize, Debug, Clone, Eq, PartialEq)]
@@ -422,10 +444,10 @@ pub struct LoggedIn {
 }
 
 /// Status
-/// 
+///
 /// # Rust
 /// * Used in many return types that update data
-/// 
+///
 /// # TTRSS
 /// * Used in many return types that update data
 #[derive(Serialize, Deserialize, Debug, Clone, Eq, PartialEq)]
@@ -436,10 +458,10 @@ pub struct Status {
 
 
 /// Unread
-/// 
+///
 /// # Rust
 /// * get_unread
-/// 
+///
 /// # TTRSS
 /// * getUnread
 #[derive(Serialize, Deserialize, Debug, Clone, Eq, PartialEq)]
@@ -448,10 +470,10 @@ pub struct Unread {
 }
 
 /// Config
-/// 
+///
 /// # Rust
 /// * get_config
-/// 
+///
 /// # TTRSS
 /// * getConfig
 #[derive(Serialize, Deserialize, Debug, Clone, Eq, PartialEq)]
@@ -464,10 +486,10 @@ pub struct Config {
 
 
 /// Preference
-/// 
+///
 /// # Rust
 /// * get_pref
-/// 
+///
 /// # TTRSS
 /// * getPref
 #[derive(Serialize, Deserialize, Debug, Clone, Eq, PartialEq)]
@@ -839,7 +861,7 @@ fn request_from_api(postdata: HashMap<&str, String>) -> ResponseResult {
     let response = client.post(&env::var(ENVVAR_TTRSS_URL)?)
         .json(&postdata)
         .send()?;
-    
+
     if response.status().is_success() {
         let mut resp = response.text()?;
         if postdata.contains_key("op") && postdata.get("op").unwrap() == "getHeadlines" {
@@ -893,4 +915,3 @@ fn populate_session_id() -> String {
         }
     }
 }
-
