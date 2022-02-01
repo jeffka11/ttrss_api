@@ -851,7 +851,7 @@ pub fn login() -> ResponseResult {
 
 
 /// Internal call to generalize communication to TTRSS' API among multiple API calls
-fn request_from_api(postdata: HashMap<&str, String>) -> ResponseResult {
+pub fn request_from_api(postdata: HashMap<&str, String>) -> ResponseResult {
     validate_or_panic();
     let client = reqwest::blocking::Client::builder()
         .timeout(std::time::Duration::from_secs(TIMEOUT))
